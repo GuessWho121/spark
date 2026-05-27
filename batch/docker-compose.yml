@@ -1,21 +1,14 @@
 x-minioconf: &minioconf
   image: minio/minio:latest
-  command: server --console-address ":9001"
-  enviroment:
+  command: server /data --console-address ":9001"
+  environment:
     - MINIO_ROOT_USER=admin
-    - MINIO_ROOT_PASSWORD=pass123
+    - MINIO_ROOT_PASSWORD=pass1234
 
 x-sparkworker: &sparkworker
-  image: bitnami/spark:latest
-  enviroment:
-    - SPARK_MODE=worker
-    - SPARK_MASTER_URL=spark://100.71.201.92:7077
-    - SPARK_HOSTNAME=100.118.210.80
-    - SPARK_WORKER_MEMORY=1G
-    - SPARK_WORKER_CORES=1
-    - SPARK_RPC_AUTHENTICATION_ENABLED=no
-
-
+  image: apache/spark:latest
+  command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://100.71.201.92:7077 --cores 1 --memory 1G --webui-port 8081
+  
 services:
   minio1:
     <<: *minioconf
