@@ -1,0 +1,19 @@
+x-minioconf:
+  image: minio/minio:latest
+  ports:
+    - 9000:9000
+    - 9001:9001
+  command: server --console-address ":9001"
+
+services:
+  minio1:
+    <<: *minioconf
+    hostname: s3_1
+    volumes:
+      - s31:/data
+
+  minio2:
+    <<: *minioconf
+    hostname: s3_2
+    volumes:
+      - s32:/data
