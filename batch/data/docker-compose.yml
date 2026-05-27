@@ -1,19 +1,65 @@
-x-minioconf:
+x-minioconf: &minioconf
   image: minio/minio:latest
-  ports:
-    - 9000:9000
-    - 9001:9001
   command: server --console-address ":9001"
+  enviroment:
+    - MINIO_ROOT_USER=admin
+    - MINIO_ROOT_PASSWORD=pass123
+
+x-sparkworker: &sparkworker
+  image: bitnami/spark:latest
+  enviroment:
+    - SPARK_MODE=worker
+    - SPARK_MASTER_URL=spark://100.71.201.92:7077
+    - SPARK_HOSTNAME=100.118.210.80
+    - SPARK_WORKER_MEMORY=1G
+    - SPARK_WORKER_CORES=1
+    - SPARK_RPC_AUTHENTICATION_ENABLED=no
+
 
 services:
   minio1:
     <<: *minioconf
+    ports:
+      - 9000:9000
+      - 9001:9001
     hostname: s3_1
+    container_name: s3_1
     volumes:
       - s31:/data
 
   minio2:
     <<: *minioconf
+    ports:
+      - 9002:9000
+      - 9003:9001
     hostname: s3_2
+    container_name: s3_2
     volumes:
       - s32:/data
+
+  worker1:
+    <<: *sparkworker
+    hostname: worker1
+    container_name: worker1
+    ports:
+      - 8081:8081
+  
+  worker2:
+    <<: *sparkworker
+    hostname: worker2
+    container_name: worker2
+    ports:
+      - 8082:8081
+
+  worker3:
+    <<: *sparkworker
+    hostname: worker3
+    container_name: worker3
+    ports:
+      - 8083:8081
+
+volumes:
+  s31:
+  s32:
+
+
